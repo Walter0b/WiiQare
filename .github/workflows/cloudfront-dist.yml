@@ -24,13 +24,17 @@ jobs:
         run: npm run build
 
       - name: Deploy to S3
-        uses: aws-actions/s3@v1
+        uses: jakejarvis/s3-sync-action@master
         with:
-          action: "upload"
-          bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}
-          region: ${{ secrets.AWS_REGION }}
-          source: dist
-          force: true
+          args: --acl public-read --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-west-1'   # optional: defaults to us-east-1
+          SOURCE_DIR: 'dist'      # optional: defaults to entire repository
+        
+     
 
       - name: Invalidate AWS CloudFront
         uses: chetan/invalidate-cloudfront-action@v2
